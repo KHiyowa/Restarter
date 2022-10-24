@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualBasic;
+using Restarter.Killer;
+using Restarter.Killer.Impl;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,12 +15,11 @@ namespace RestartYamabuki
 
     public partial class Tasktray : Component
     {
-        String appName = Environment.GetCommandLineArgs()[1];
+        readonly String appName = Environment.GetCommandLineArgs()[1];
+        readonly String appIcon = Environment.GetCommandLineArgs()[2];
+        readonly String exeName = Environment.GetCommandLineArgs()[3];
 
-        String appIcon = Environment.GetCommandLineArgs()[2];
-
-        String exeName = Environment.GetCommandLineArgs()[3];
-
+        readonly Killer killer = new ProcessTreeKiller();
         Process process;
 
         public Tasktray()
@@ -29,12 +30,12 @@ namespace RestartYamabuki
                 Application.Exit();
             }
 
-            this.setComponents();
+            this.SetComponents();
             InitializeComponent();
             process = Process.Start(exeName);
         }
 
-        private void setComponents()
+        private void SetComponents()
         {
             NotifyIcon notifyIcon = new();
             notifyIcon.Icon = new Icon(appIcon);
@@ -45,30 +46,30 @@ namespace RestartYamabuki
 
             ToolStripMenuItem exit = new ToolStripMenuItem();
             exit.Text = "終了";
-            exit.Click += exit_Click;
+            exit.Click += Exit_Click;
 
             ToolStripMenuItem restart = new ToolStripMenuItem();
             restart.Text = appName + " を再起動";
-            restart.Click += restart_Click;
+            restart.Click += Restart_Click;
 
             contextMenuStrip.Items.AddRange(new
                 System.Windows.Forms.ToolStripItem[] {restart, exit});
             notifyIcon.ContextMenuStrip = contextMenuStrip;
         }
 
-        private void restart_Click(object sender, EventArgs e)
+        private void Restart_Click(object sender, EventArgs e)
         {
-            process.Kill();
+            killer.Kill(process);
             process = Process.Start(exeName);
         }
-        private void exit_Click(object sender, EventArgs e)
+        private void Exit_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("終了しますか", appName + " Restarter", MessageBoxButtons.YesNo) == DialogResult.No)
             {
                 return;
             }
             // アプリケーションの終了
-            process.Kill();
+            killer.Kill(process);
             Application.Exit();
         }
     }
