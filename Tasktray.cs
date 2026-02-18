@@ -1,34 +1,34 @@
-﻿using Microsoft.VisualBasic;
-using Restarter.Killer;
+﻿using Restarter.Killer;
 using Restarter.Killer.Impl;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace RestartYamabuki
 {
 
     public partial class Tasktray : Component
     {
-        readonly String appName = Environment.GetCommandLineArgs()[1];
-        readonly String appIcon = Environment.GetCommandLineArgs()[2];
-        readonly String exeName = Environment.GetCommandLineArgs()[3];
+        private String appName;
+        private String appIcon;
+        private String exeName;
 
         readonly Killer killer = new ProcessTreeKiller();
         Process process;
 
         public Tasktray()
         {
-            if (Environment.GetCommandLineArgs().Length < 4)
+            string[] args = Environment.GetCommandLineArgs();
+
+            if (args.Length < 4)
             {
                 MessageBox.Show("Usage: restarter.exe App_name ICO_file EXE_file", "Restarter");
                 Application.Exit();
+                return;
             }
+
+            appName = args[1];
+            appIcon = args[2];
+            exeName = args[3];
 
             this.SetComponents();
             InitializeComponent();
