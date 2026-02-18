@@ -1,0 +1,70 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        architecture: [x64]
+
+    env:
+      SOLUTION_FILE: Restarter.sln
+      DOTNET_VERSION: '10.0.x' 
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ${{ env.SOLUTION_FILE }} --configuration Release --runtime win-${{ matrix.architecture }} --output ./publish_temp/Restarter --no-build
+
+      - name: Create zip archive
+        run: |
+          Compress-Archive -Path ./publish_temp/Restarter -DestinationPath ./Restarter-${{ matrix.architecture }}-${{ github.ref_name }}.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-asset-${{ matrix.architecture }}
+          path: ./Restarter-${{ matrix.architecture }}-${{ github.ref_name }}.zip
+
+  create_release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents:
+
+    steps:
+      - name: Download x64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-asset-x64
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: Restarter-x64-${{ github.ref_name }}.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
