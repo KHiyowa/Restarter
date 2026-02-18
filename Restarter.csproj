@@ -6,6 +6,13 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+	<Title>Restarter</Title>
+	<AssemblyTitle>Restarter</AssemblyTitle>
+	<AssemblyCopyright>© Hiyowa Records 2017-2026</AssemblyCopyright>
+	<Company>Hiyowa Records</Company>
+	<Product>Restarter</Product>
+	<Version>2.0.0</Version>
+	<Authors>Hiyowa Kyobashi</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
