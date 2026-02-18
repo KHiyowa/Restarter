@@ -1,4 +1,4 @@
-namespace RestartYamabuki
+namespace Restarter
 {
     internal static class Program
     {
@@ -10,6 +10,12 @@ namespace RestartYamabuki
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
+            if (Environment.GetCommandLineArgs().Length < 4)
+            {
+                MessageBox.Show("Usage: restarter.exe App_name ICO_file EXE_file [EXE_args]", "Restarter");
+                return;
+            }
+
             ApplicationConfiguration.Initialize();
             Tasktray tasktray = new();
             Application.Run();

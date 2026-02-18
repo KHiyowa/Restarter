@@ -1,4 +1,4 @@
-﻿namespace RestartYamabuki
+﻿namespace Restarter
 {
     partial class Tasktray
     {
